@@ -1,0 +1,8 @@
+# AIO unified entry. Keep the default project inferred from cwd;
+# dispatch and board calls explicitly select the task project.
+[mcp_servers.aio-hub]
+command = '{{MCP}}\runtime\node\node.exe'
+args = ['{{MCP}}\protocol\hub\hub.mjs']
+env = { AIO_AGENT = "codex" }
+startup_timeout_sec = 30
+tool_timeout_sec = 1800

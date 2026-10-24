@@ -1,0 +1,21 @@
+# .Allinone permission protocol v0.2 (MCP\protocol\PERMISSIONS.md):
+# everything else runs freely; these irreversible commands need confirmation.
+
+prefix_rule(pattern = ["git", "push"], decision = "prompt", justification = "对外发出：推送后别人已经拿到，撤不回来")
+prefix_rule(pattern = ["git", "reset", "--hard"], decision = "prompt", justification = "改写历史：丢弃未提交的改动")
+prefix_rule(pattern = ["git", "clean"], decision = "prompt", justification = "永久删除未跟踪的文件")
+prefix_rule(pattern = ["git", "rebase"], decision = "prompt", justification = "改写历史")
+prefix_rule(pattern = ["git", "filter-branch"], decision = "prompt", justification = "改写历史")
+prefix_rule(pattern = ["npm", "publish"], decision = "prompt", justification = "对外发布")
+prefix_rule(pattern = ["gh", "pr", ["create", "merge", "close", "comment"]], decision = "prompt", justification = "对外发出")
+prefix_rule(pattern = ["gh", ["release", "issue", "repo"], ["create", "delete", "edit", "close", "comment"]], decision = "prompt", justification = "对外发出")
+prefix_rule(pattern = ["rm"], decision = "prompt", justification = "永久删除（不经回收站）")
+prefix_rule(pattern = ["del"], decision = "prompt", justification = "永久删除（不经回收站）")
+prefix_rule(pattern = ["rmdir"], decision = "prompt", justification = "永久删除（不经回收站）")
+prefix_rule(pattern = ["Remove-Item"], decision = "prompt", justification = "永久删除（不经回收站）")
+prefix_rule(pattern = ["format"], decision = "prompt", justification = "永久删除")
+prefix_rule(pattern = ["setx"], decision = "prompt", justification = "系统级改动")
+prefix_rule(pattern = ["reg", ["add", "delete", "import"]], decision = "prompt", justification = "系统级改动")
+prefix_rule(pattern = ["netsh"], decision = "prompt", justification = "系统级改动")
+prefix_rule(pattern = ["shutdown"], decision = "prompt", justification = "系统级改动")
+prefix_rule(pattern = ["cmdkey"], decision = "prompt", justification = "凭证与账号")

@@ -1,0 +1,28 @@
+# Codex config for the Allinone copy (CODEX_HOME = this folder). Placed by `aio init`.
+
+# Keep the login token in this folder (auth.json) instead of the Windows keyring.
+cli_auth_credentials_store = "file"
+# This copy is updated by hand from GitHub Releases.
+check_for_update_on_startup = false
+
+# Permission protocol (MCP/protocol/PERMISSIONS.md): broad freedom, only irreversible
+# commands need confirmation (see rules/allinone.rules).
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+
+[sandbox_workspace_write]
+# Widen this (for example to your user folder) if leads should write outside the workbench.
+writable_roots = ['{{MCP}}']
+network_access = true
+
+[windows]
+# Codex 0.164's elevated sandbox could not start commands on the author's machine
+# (CreateProcessWithLogonW 5, see openai/codex#9062). "unelevated" works; try "elevated" on newer versions.
+sandbox = "unelevated"
+
+[mcp_servers.aio-hub]
+command = '{{MCP}}/runtime/node/node.exe'
+args = ['{{MCP}}/protocol/hub/hub.mjs']
+env = { AIO_AGENT = "codex" }
+startup_timeout_sec = 30
+tool_timeout_sec = 1800

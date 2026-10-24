@@ -1,0 +1,8 @@
+# Windows batch files must keep CRLF line endings or cmd.exe can misparse labels and gotos.
+*.cmd text eol=crlf
+*.mjs text eol=lf
+*.md  text eol=lf
+*.json text eol=lf
+*.toml text eol=lf
+*.yml text eol=lf
+*.rules text eol=lf

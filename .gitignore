@@ -1,0 +1,39 @@
+# Never publish programs, logins, sessions, task data or local history.
+
+# Agent programs and their homes (config, credentials, sessions, logs)
+MCP/agents/*/bin/*
+MCP/agents/*/home/*
+!MCP/agents/*/bin/.gitkeep
+!MCP/agents/*/home/.gitkeep
+
+# Portable Node.js and npm cache
+MCP/runtime/*
+!MCP/runtime/.gitkeep
+
+# Boards, receipts, trash, quota cache
+MCP/board/*
+!MCP/board/.gitkeep
+
+# Task projects: only the rules, the hookup configs and the template are tracked
+MCP/projects/*
+!MCP/projects/_template/
+!MCP/projects/AGENTS.md
+!MCP/projects/CLAUDE.md
+!MCP/projects/GEMINI.md
+!MCP/projects/.mcp.json
+!MCP/projects/.codex/
+
+# Not-yet-implemented extensions, local iteration notes, self-test scratch
+MCP/extensions/
+devlog/
+diagnostics/_selftest-*/
+diagnostics/.verify-live-*/
+
+# Secrets anywhere, just in case
+*.credentials*
+auth.json
+deepseek-api-key.txt
+google_accounts.json
+.env
+*.pem
+*.key

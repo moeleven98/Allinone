@@ -1,0 +1,15 @@
+# Append this to MCP\agents\deepseek\home\profiles\web\cordis.patch.yml after dsh has
+# created the web profile once (run: MCP\launch\dsh.cmd web --help). Replace {{MCP}}
+# with your MCP folder, using forward slashes. Only the web profile (lead) gets the hub;
+# the headless profile used for dispatched workers must not.
+- insert:
+    - id: mcp-aio-hub
+      name: '@deepseek-ai/dsh-mcp-client'
+      config:
+        serverName: aio-hub
+        transport: stdio
+        command: '{{MCP}}/runtime/node/node.exe'
+        args: ['{{MCP}}/protocol/hub/hub.mjs']
+        env:
+          AIO_AGENT: deepseek
+        toolCallTimeoutMs: 1800000

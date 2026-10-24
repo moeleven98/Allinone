@@ -1,0 +1,16 @@
+{
+  "allinone-guard": {
+    "PreToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "{{MCP_WIN_JSON}}\\runtime\\node\\node.exe {{MCP_WIN_JSON}}\\protocol\\hub\\guard.mjs --for agy",
+            "timeout": 15
+          }
+        ]
+      }
+    ]
+  }
+}

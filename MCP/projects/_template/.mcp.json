@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "aio-hub": {
+      "type": "stdio",
+      "command": "{{MCP}}\\runtime\\node\\node.exe",
+      "args": ["{{MCP}}\\protocol\\hub\\hub.mjs"],
+      "env": { "AIO_AGENT": "claude", "AIO_PROJECT": "__PROJECT__" }
+    }
+  }
+}

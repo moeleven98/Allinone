@@ -1,0 +1,6 @@
+{
+  "permissions": {
+    "allow": ["read_file(*)", "write_file(*)", "command(*)"]
+  },
+  "trustedWorkspaces": ["{{MCP_WIN_JSON}}\\projects"]
+}

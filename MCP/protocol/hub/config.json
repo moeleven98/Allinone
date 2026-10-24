@@ -1,0 +1,118 @@
+{
+  "$comment": "Settings for the .Allinone dispatch hub. Paths may use {MCP} for the .Allinone\\MCP folder. See protocol\\PERMISSIONS.md for the rules these implement.",
+
+  "budgetCnyPerDay": 10,
+  "trashRetentionDays": 30,
+  "maxTrashBytes": 5368709120,
+  "maxReadBytes": 2097152,
+  "approvalTimeoutSec": 600,
+  "defaultDispatchTimeoutSec": 900,
+
+  "leaderTools": ["dispatch", "route_preview", "quota", "board"],
+
+  "routing": {
+    "receiptPreviewChars": 200,
+    "$comment": "Mirror of protocol\\ROUTING.md section 3/4. Inside a tier, agents count as tied and the one with the most remaining quota is chosen.",
+    "lowQuotaPercent": 10,
+    "staleAfterHours": 24,
+    "quotaErrorPattern": "usage limit|rate.?limit|\\b429\\b|quota|exceeded your|limit reached|额度",
+    "categories": {
+      "code":       { "label": "写代码 / 改 bug / 重构 / 测试 / 命令行", "tiers": [["codex", "claude"], ["gemini"]], "lastResort": "deepseek" },
+      "review":     { "label": "代码审查 / 方案审查", "tiers": [["codex", "claude"], ["gemini"]], "lastResort": "deepseek" },
+      "image":      { "label": "生成图片", "tiers": [["codex"]], "lastResort": null },
+      "longtext":   { "label": "读长文 / 总结 / 提炼", "tiers": [["gemini"], ["claude", "codex"]], "lastResort": "deepseek" },
+      "writing":    { "label": "润色 / 改写 / 文案", "tiers": [["gemini"], ["claude", "codex"]], "lastResort": "deepseek" },
+      "multimodal": { "label": "看视频 / 图片 / 图表", "tiers": [["gemini"], ["codex", "claude"]], "lastResort": null },
+      "research":   { "label": "查资料 / 整理信息", "tiers": [["gemini"], ["codex", "claude"]], "lastResort": "deepseek" },
+      "general":    { "label": "其他", "tiers": [["codex", "claude", "gemini"]], "lastResort": "deepseek" }
+    }
+  },
+
+  "sensitivePathPatterns": [
+    "\\\\\\.ssh\\\\",
+    "\\.credentials(\\.json|\\.yaml)?$",
+    "\\\\auth\\.json$",
+    "\\\\google_accounts\\.json$",
+    "\\\\deepseek-api-key\\.txt$",
+    "\\.env$",
+    "\\.pem$",
+    "\\.key$",
+    "\\\\\\.sandbox-secrets\\\\",
+    "\\\\User Data\\\\"
+  ],
+
+  "irreversibleCommandPatterns": [
+    { "why": "永久删除（不经回收站）", "re": "(^|[\\s;&|(])(rm|del|erase|rd|rmdir|Remove-Item|ri|format|diskpart|cipher\\s+/w)(\\s|$)" },
+    { "why": "对外发出", "re": "\\bgit\\s+push\\b|\\bnpm\\s+publish\\b|\\bgh\\s+(pr\\s+create|pr\\s+merge|release\\s+create|issue\\s+create|repo\\s+create)\\b|-Method\\s+(Post|Put|Delete|Patch)\\b|\\bcurl\\b.*\\s-X\\s*(POST|PUT|DELETE|PATCH)\\b|\\bcurl\\b.*\\s(-d|--data)\\b|Send-MailMessage" },
+    { "why": "改写历史", "re": "\\bgit\\s+(reset\\s+--hard|clean\\b|push\\s+(-f|--force)|filter-branch|rebase)\\b" },
+    { "why": "系统级改动", "re": "\\b(setx|reg\\s+(add|delete|import)|netsh|bcdedit|sc(\\.exe)?\\s+(create|delete|config)|New-LocalUser|Remove-LocalUser|Set-LocalUser|Set-ExecutionPolicy|Set-MpPreference|Add-MpPreference|New-NetFirewallRule|Remove-NetFirewallRule|shutdown|Restart-Computer|Stop-Computer)\\b|SetEnvironmentVariable|Set-ItemProperty\\s+.*HK(LM|CU):|Remove-ItemProperty\\s+.*HK(LM|CU):" },
+    { "why": "凭证与账号", "re": "\\b(codex|claude|agy)(\\.exe|\\.cmd)?\\s+(logout|auth\\s+logout)\\b|/logout\\b|\\bcmdkey\\s+/(add|delete|generic)\\b" },
+    { "why": "数据库破坏性操作", "re": "\\b(DROP\\s+(TABLE|DATABASE|SCHEMA)|TRUNCATE\\s+TABLE)\\b|\\bDELETE\\s+FROM\\s+\\w+\\s*(;|$)" }
+  ],
+
+  "agents": {
+    "codex": {
+      "label": "Codex（ChatGPT Plus 订阅）",
+      "paid": false,
+      "strengths": ["写代码", "代码审查", "测试", "图像（待验证）"],
+      "command": "{MCP}\\agents\\codex\\bin\\codex-x86_64-pc-windows-msvc.exe",
+      "args": ["-a", "never", "exec", "-s", "workspace-write", "--skip-git-repo-check", "-c", "mcp_servers.aio-hub.enabled=false", "-c", "windows.sandbox=\"unelevated\"", "-C", "{cwd}", "--json", "{task}"],
+      "env": {
+        "CODEX_HOME": "{MCP}\\agents\\codex\\home",
+        "CODEX_SQLITE_HOME": "{MCP}\\agents\\codex\\home\\sqlite",
+        "TEMP": "{MCP}\\agents\\codex\\home\\tmp",
+        "TMP": "{MCP}\\agents\\codex\\home\\tmp",
+        "PATH": "{MCP}\\agents\\codex\\bin\\codex-path;{MCP}\\agents\\codex\\bin;{PATH}"
+      },
+      "parser": "codex"
+    },
+    "claude": {
+      "label": "Claude Code（Claude Pro 订阅）",
+      "paid": false,
+      "strengths": ["架构设计", "重构", "排查问题", "代码审查"],
+      "command": "{MCP}\\agents\\claude\\bin\\claude.exe",
+      "args": ["-p", "{task}", "--output-format", "json", "--permission-mode", "dontAsk", "--strict-mcp-config", "--mcp-config", "{\"mcpServers\":{}}"],
+      "env": {
+        "CLAUDE_CONFIG_DIR": "{MCP}\\agents\\claude\\home",
+        "CLAUDE_CODE_TMPDIR": "{MCP}\\agents\\claude\\home\\tmp",
+        "DISABLE_AUTOUPDATER": "1",
+        "ANTHROPIC_API_KEY": ""
+      },
+      "parser": "claude"
+    },
+    "gemini": {
+      "label": "agy / Gemini（Gemini Pro 订阅）",
+      "paid": false,
+      "strengths": ["读长文本", "总结", "润色改写", "查资料"],
+      "command": "{MCP}\\agents\\gemini\\bin\\agy.exe",
+      "args": ["-p", "{task}", "--output-format", "json", "--mode", "accept-edits", "--print-timeout", "{timeoutSec}s"],
+      "env": {
+        "USERPROFILE": "{MCP}\\agents\\gemini\\home",
+        "HOME": "{MCP}\\agents\\gemini\\home",
+        "LOCALAPPDATA": "{MCP}\\agents\\gemini\\home\\AppData\\Local",
+        "APPDATA": "{MCP}\\agents\\gemini\\home\\AppData\\Roaming",
+        "TEMP": "{MCP}\\agents\\gemini\\home\\tmp",
+        "TMP": "{MCP}\\agents\\gemini\\home\\tmp"
+      },
+      "parser": "gemini"
+    },
+    "deepseek": {
+      "label": "DSH / DeepSeek（API 按量付费，只做顶班）",
+      "paid": true,
+      "strengths": ["订阅额度不足时顶班", "批量小活"],
+      "command": "{MCP}\\runtime\\node\\node.exe",
+      "args": ["{MCP}\\agents\\deepseek\\bin\\node_modules\\@deepseek-ai\\dsh\\lib\\bin.js", "headless", "--json", "{task}"],
+      "env": {
+        "DSH_HOME": "{MCP}\\agents\\deepseek\\home",
+        "DSH_AGENTS_HOME": "{MCP}\\agents\\deepseek\\home\\.agents",
+        "DSH_PERMISSION_MODE": "workspace-write",
+        "DSH_TELEMETRY_DISABLED": "1",
+        "TEMP": "{MCP}\\agents\\deepseek\\home\\tmp",
+        "TMP": "{MCP}\\agents\\deepseek\\home\\tmp",
+        "PATH": "{MCP}\\runtime\\node;{PATH}"
+      },
+      "secretEnvFiles": { "DEEPSEEK_API_KEY": "{MCP}\\agents\\deepseek\\home\\deepseek-api-key.txt" },
+      "parser": "deepseek"
+    }
+  }
+}
